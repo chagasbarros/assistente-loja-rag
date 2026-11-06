@@ -1,0 +1,26 @@
+[
+  {
+    "assunto": "Cliente Mariana Lopes (CPF 123.456.789-09, e-mail mariana.lopes@exemplo.com) recebeu um tênis de número errado e quer trocar 12 dias após o recebimento.",
+    "resolucao": "Troca aprovada, pois está dentro do prazo de 30 dias corridos. Como é a primeira troca do pedido, enviamos o código de postagem gratuito para o e-mail mariana.lopes@exemplo.com."
+  },
+  {
+    "assunto": "Cliente com telefone (11) 98765-4321 informa que o pedido para Recife ainda não chegou após 6 dias úteis.",
+    "resolucao": "Explicamos que o prazo para o Nordeste é de 5 a 9 dias úteis após a aprovação do pagamento e enviamos novamente o código de rastreio. O pedido foi entregue no 8º dia útil."
+  },
+  {
+    "assunto": "Cliente de CPF 98765432100 pediu reembolso de um fone de ouvido que caiu no chão e parou de funcionar.",
+    "resolucao": "Reembolso negado: a garantia não cobre danos causados por quedas ou impactos. Oferecemos o contato da assistência técnica para orçamento de conserto pago."
+  },
+  {
+    "assunto": "Notebook apresentou defeito na tela 3 dias após a entrega. Contato do cliente: joao.pereira@exemplo.com, telefone +55 21 99876-5432.",
+    "resolucao": "Como o defeito apareceu em até 7 dias corridos após o recebimento, fizemos a troca imediata por um notebook novo, sem passar pela assistência técnica."
+  },
+  {
+    "assunto": "Cliente Ana Souza (CPF 111.222.333-96) quer devolver uma camiseta personalizada com o nome dela porque se arrependeu da compra.",
+    "resolucao": "Devolução negada: produtos personalizados não podem ser trocados nem devolvidos por arrependimento, exceto em caso de defeito."
+  },
+  {
+    "assunto": "Pedido voltou para o centro de distribuição após 3 tentativas de entrega sem ninguém em casa. Cliente com e-mail carlos.mendes@exemplo.com e telefone (85) 3456-7890 pede reenvio.",
+    "resolucao": "Reenvio feito mediante pagamento de um novo frete, conforme a política de tentativas de entrega, mesmo a compra original tendo frete grátis."
+  }
+]

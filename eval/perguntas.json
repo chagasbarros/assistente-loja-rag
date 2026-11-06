@@ -1,0 +1,12 @@
+[
+  { "pergunta": "Em quantos dias posso trocar um produto?", "esperado": "30 dias" },
+  { "pergunta": "Qual o prazo de entrega para o Nordeste?", "esperado": "5 a 9" },
+  { "pergunta": "A partir de qual valor o frete é grátis para São Paulo, no Sudeste?", "esperado": "299" },
+  { "pergunta": "Quanto custa fazer uma segunda troca do mesmo pedido?", "esperado": "19,90" },
+  { "pergunta": "Quanto de desconto eu ganho pagando com Pix?", "esperado": "5%" },
+  { "pergunta": "Quanto custa a garantia estendida de um notebook?", "esperado": "10%" },
+  { "pergunta": "Até que horas o atendimento funciona no sábado?", "esperado": "14h" },
+  { "pergunta": "Depois que devolvo o produto, em quanto tempo recebo o reembolso?", "esperado": "10 dias úteis" },
+  { "pergunta": "Vocês aceitam gift card como forma de pagamento?", "semResposta": true },
+  { "pergunta": "Qual o endereço da loja física para eu retirar meu pedido?", "semResposta": true }
+]
