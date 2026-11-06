@@ -1,10 +1,26 @@
-// API HTTP: POST /perguntar e GET /saude.
+// API HTTP: POST /perguntar e GET /saude. Se o frontend tiver sido buildado
+// (web/dist), também serve o chat em "/".
+import { existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import Fastify from "fastify";
+import fastifyStatic from "@fastify/static";
 import { z, ZodError } from "zod";
 import { ask } from "./rag.js";
 import { ModelError } from "./retry.js";
 
 const app = Fastify({ logger: true }); // o Fastify loga método, URL e status, nunca o corpo
+
+// Caminho absoluto de web/dist, calculado a partir deste arquivo (e não da
+// pasta onde o comando foi rodado). O @fastify/static exige caminho absoluto.
+const WEB_DIST = fileURLToPath(new URL("../web/dist", import.meta.url));
+
+// Só serve o frontend se o build existir. Em desenvolvimento quem serve a
+// página é o Vite (npm run web:dev); em produção é a própria API, na mesma
+// origem: por isso não precisamos de CORS.
+if (existsSync(WEB_DIST)) {
+  await app.register(fastifyStatic, { root: WEB_DIST });
+  app.log.info("servindo o frontend de web/dist");
+}
 
 const PerguntaSchema = z.object({
   pergunta: z.string().trim().min(3).max(500),
@@ -54,7 +70,10 @@ app.setErrorHandler((error: unknown, request, reply) => {
   return reply.code(500).send({ erro: "Erro interno." });
 });
 
-app.listen({ port: 3000, host: "0.0.0.0" }).catch((err: unknown) => {
+// Serviços de hospedagem (Render, Railway...) definem a porta pela variável PORT.
+const PORT = Number(process.env.PORT ?? 3000);
+
+app.listen({ port: PORT, host: "0.0.0.0" }).catch((err: unknown) => {
   app.log.error({ erro: (err as Error).name }, (err as Error).message);
   process.exit(1);
 });

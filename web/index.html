@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Assistente da Loja</title>
+  </head>
+  <body>
+    <header class="topo">
+      <h1>Assistente da Loja</h1>
+      <p>Responde só com base nos documentos da loja (dados fictícios).</p>
+    </header>
+
+    <!-- aria-live: leitores de tela anunciam as respostas novas -->
+    <main id="mensagens" aria-live="polite">
+      <div class="msg assistente">
+        <p>Olá! Pergunte sobre trocas, frete, garantia, pagamento ou atendimento.</p>
+        <div class="exemplos">
+          <button type="button" class="exemplo">Em quantos dias posso trocar um produto?</button>
+          <button type="button" class="exemplo">Qual o prazo de entrega para o Nordeste?</button>
+          <button type="button" class="exemplo">Quanto custa a garantia estendida?</button>
+        </div>
+      </div>
+    </main>
+
+    <form id="formulario" class="formulario">
+      <label for="pergunta" class="oculto">Sua pergunta</label>
+      <textarea id="pergunta" rows="2" maxlength="500" placeholder="Digite sua pergunta…"></textarea>
+      <div class="rodape-form">
+        <span id="aviso" class="aviso" role="alert"></span>
+        <span id="contador" class="contador">0/500</span>
+        <button id="enviar" type="submit">Enviar</button>
+      </div>
+    </form>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

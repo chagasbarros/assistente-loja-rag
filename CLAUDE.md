@@ -15,13 +15,14 @@ Este é um **projeto de estudo de nível júnior**. Regras de colaboração:
 | --- | --- |
 | Runtime | Node.js 20.6+ (ESM, `"type": "module"`) |
 | Linguagem | TypeScript estrito + `tsx` para rodar `.ts` direto |
-| API HTTP | Fastify (logger pino embutido) |
+| API HTTP | Fastify (logger pino embutido) + `@fastify/static` para servir o build do frontend |
 | Validação | zod |
 | IA (texto e embeddings) | `@google/genai` (SDK oficial do Gemini) |
 | Vetores | Arquivo JSON + similaridade de cosseno (sem banco vetorial) |
 | Data lake | Pastas locais em `datalake/` |
 | CSV | `csv-parse` |
 | Testes | vitest (só funções puras: chunking e mascaramento) |
+| Frontend | Vite + TypeScript puro, sem framework, em `web/` (com `package.json` e `tsconfig.json` próprios) |
 
 `tsconfig.json`: `target ES2022`, `module NodeNext`, `moduleResolution NodeNext`, `strict true`, `esModuleInterop true`, `skipLibCheck true`, `outDir dist`, `include ["src"]`.
 Com `NodeNext`, imports locais levam extensão `.js` (`import { chunkText } from "./chunk.js"`), mesmo o arquivo sendo `.ts`.
@@ -35,7 +36,15 @@ npm run dev         # tsx --env-file=.env src/server.ts        API em localhost:
 npm run eval        # tsx --env-file=.env src/eval.ts          roda eval/perguntas.json
 npm run typecheck   # tsc --noEmit
 npm test            # vitest run
+npm run web:dev     # Vite em localhost:5173 (proxy de /perguntar e /saude para :3000)
+npm run web:build   # typecheck + build do frontend em web/dist
+npm run build       # produção: web ci + web:build + ingest + tsx src/build-index.ts (chave do ambiente)
+npm start           # produção: tsx src/server.ts (sem --env-file), porta de PORT
 ```
+
+`start` e `build` **não** usam `--env-file`: em produção não existe `.env` e o Node falha com `node: .env: not found`. As variáveis vêm do ambiente (painel do serviço).
+
+Na primeira vez, instale as dependências do frontend com `npm --prefix web install`.
 
 Se a versão do `tsx` não aceitar `--env-file`, use `dotenv` (`import "dotenv/config"` no topo dos scripts que chamam a API).
 
@@ -63,7 +72,14 @@ src/
   eval.ts         avaliação
 tests/
   chunk.test.ts  pii.test.ts
+web/
+  index.html      página do chat
+  vite.config.ts  proxy para a API em desenvolvimento
+  src/main.ts     fetch + DOM (sem innerHTML com texto do modelo)
+  src/style.css
 ```
+
+O frontend não importa nada de `src/`: conhece só o contrato da API (o tipo `Answer` é duplicado em `web/src/main.ts`).
 
 Só `llm.ts` e `embeddings.ts` falam com o Gemini. Mantenha assim: trocar de provedor deve exigir mexer só nesses dois arquivos.
 
@@ -201,6 +217,9 @@ Cada fase termina com `npm run typecheck` sem erros e o critério "Pronto quando
 
    > **Decisão (6/11/2026):** a comparação com o `gemini-3.8-flash` deixou de ser obrigatória. O `flash-lite` já atingiu 10/10 (acima das metas), é o mais barato e rápido, e o `3.8-flash` no plano gratuito tinha cota de 20 requisições/dia e ficou indisponível por sobrecarga (503 e chamadas penduradas) nas tentativas de 5 e 6/11/2026. Pela ordem de investigação abaixo, trocar de modelo só se justifica depois de falhas que chunk, `k` e prompt não resolvam. Foi também nesse episódio que entrou o `timeout_ms` de 60 s no `llm.ts`.
 8. **README.** O que o projeto faz, diagrama da arquitetura, como rodar, exemplo de requisição/resposta, tabela da avaliação, limitações e próximos passos. *Pronto quando:* alguém consegue rodar tudo só com o README.
+
+9. **Frontend.** Pasta `web/` com Vite + TypeScript: uma página de chat com campo de pergunta (3 a 500 caracteres, Enter envia), balões de pergunta/resposta, fontes citadas, mensagens de erro da API e perguntas de exemplo. A resposta do modelo é montada com `textContent` (nunca `innerHTML`); `**negrito**` vira `<strong>`. *Pronto quando:* `npm run web:build` passa e, com `npm run dev` + `npm run web:dev`, o chat em `localhost:5173` responde, recusa e mostra erros.
+10. **Preparar deploy num serviço só.** A API serve `web/dist` com `@fastify/static` (só se a pasta existir), lê a porta de `PORT` (padrão 3000) e ganha `npm start` e `npm run build` sem `--env-file`. `tsx` fica em `dependencies` (roda o servidor em produção). README com sugestão de deploy no Render (`npm ci && npm run build` / `npm start`). *Pronto quando:* em modo produção local, `localhost:3000/` abre o chat e as perguntas funcionam.
 
 Se uma pergunta da avaliação falhar, investigue nesta ordem: o chunk certo veio no top-4 (`fontes`)? Ajustar chunk, sobreposição e `k`. Ajustar o system prompt. Só então testar outro modelo.
 

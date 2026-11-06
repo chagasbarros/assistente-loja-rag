@@ -144,6 +144,66 @@ Invoke-RestMethod -Method Post -Uri http://localhost:3000/perguntar `
 
 Para ver se a API está no ar: `GET http://localhost:3000/saude` devolve `{"ok":true}`.
 
+### 7. Usar o chat no navegador
+
+O frontend fica em `web/` (Vite + TypeScript, sem framework). Com a API rodando (passo 5), abra **outro** terminal:
+
+```bash
+npm --prefix web install   # só na primeira vez
+npm run web:dev
+```
+
+Abra **http://localhost:5173**. O Vite repassa `/perguntar` e `/saude` para a API na porta 3000 (proxy), então não é preciso configurar CORS.
+
+### Modo produção (tudo num servidor só)
+
+Em produção não há Vite: a própria API entrega o chat. Se a pasta `web/dist` existir, o servidor serve a página em `/` e continua respondendo `/perguntar` e `/saude` na mesma origem.
+
+```bash
+npm run web:build   # gera web/dist
+npm run dev         # agora http://localhost:3000 abre o chat
+```
+
+## Deploy (sugestão)
+
+Sugestão: **[Render](https://render.com)**, num *Web Service* gratuito ligado a este repositório do GitHub. Um serviço só roda a API e entrega o chat, sem CORS.
+
+1. No Render: **New → Web Service** e escolha o repositório.
+2. Preencha:
+
+   | Campo | Valor |
+   | --- | --- |
+   | Runtime | Node |
+   | Build Command | `npm ci && npm run build` |
+   | Start Command | `npm start` |
+   | Health Check Path | `/saude` |
+   | Instance Type | Free |
+
+3. Em **Environment**, crie as variáveis (nunca no código nem no Git):
+
+   | Variável | Valor |
+   | --- | --- |
+   | `GEMINI_API_KEY` | sua chave |
+   | `GEMINI_MODEL` | `gemini-3.5-flash-lite` |
+   | `NODE_VERSION` | `24` |
+
+4. Clique em **Deploy**. Cada `git push` na `main` gera um novo deploy.
+
+O que acontece no build e por quê:
+
+- **O índice é criado no build.** `datalake/index` fica fora do Git, então o `npm run build` roda a ingestão e gera os embeddings (custa uma chamada à API por deploy). Se a chave estiver errada, o build falha com `status 400` em vez de subir um site quebrado.
+- **Sem `.env` em produção.** As variáveis vêm do painel do Render. Por isso `npm start` e `npm run build` não usam `--env-file` (o Node falha se o arquivo não existir).
+- **Não defina `NODE_ENV=production` no build:** o npm deixaria de instalar o TypeScript e o Vite, que o build do frontend usa.
+
+**Limitações do plano gratuito:** o serviço "dorme" após ~15 minutos sem acessos, e a primeira pergunta depois disso pode levar de 30 a 60 segundos.
+
+**Antes de divulgar o link:**
+
+- Qualquer pessoa com o link pode gastar a cota do Gemini. Considere adicionar limite de requisições por cliente (`@fastify/rate-limit`).
+- No plano gratuito do Gemini, o Google pode usar o que for enviado (perguntas incluídas) para melhorar os produtos dele. Avise isso na página se o site for público.
+
+**Alternativas:** [Railway](https://railway.com) (mesmos comandos, cobra por uso após o crédito inicial) e [Fly.io](https://fly.io) (exige um `Dockerfile` ou `fly launch`).
+
 ### Problemas comuns
 
 | Sintoma | Causa provável | Solução |
@@ -166,6 +226,10 @@ Para ver se a API está no ar: `GET http://localhost:3000/saude` devolve `{"ok":
 | `npm run eval` | Roda as 10 perguntas de `eval/perguntas.json` | Sim |
 | `npm run typecheck` | `tsc --noEmit` | Não |
 | `npm test` | Testes com vitest | Não |
+| `npm run web:dev` | Chat no navegador em `localhost:5173` (precisa da API rodando) | Via API |
+| `npm run web:build` | Typecheck e build do frontend em `web/dist` | Não |
+| `npm run build` | Build completo para produção: frontend + `ingest` + índice (lê a chave do ambiente, não do `.env`) | Sim (embeddings) |
+| `npm start` | API em produção, servindo também o chat; porta da variável `PORT` (padrão 3000) | Sim |
 
 ## Exemplo de requisição e resposta
 
@@ -279,6 +343,11 @@ src/
 tests/
   chunk.test.ts
   pii.test.ts
+web/                frontend (Vite + TypeScript)
+  index.html        página do chat
+  vite.config.ts    proxy para a API em desenvolvimento
+  src/main.ts       envia a pergunta e mostra resposta, fontes e erros
+  src/style.css     visual (tema claro/escuro, funciona no celular)
 ```
 
 Só `embeddings.ts` e `llm.ts` falam com o Gemini. Trocar de provedor de IA exige mexer só nesses dois arquivos.

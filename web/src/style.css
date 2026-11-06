@@ -1,0 +1,180 @@
+/* Cores em variáveis para trocar fácil entre tema claro e escuro. */
+:root {
+  --fundo: #f5f6f8;
+  --superficie: #ffffff;
+  --texto: #1d2129;
+  --texto-suave: #5f6673;
+  --borda: #dcdfe5;
+  --primaria: #2563eb;
+  --primaria-texto: #ffffff;
+  --erro-fundo: #fdecec;
+  --erro-texto: #9b1c1c;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--texto);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fundo: #15171c;
+    --superficie: #22252c;
+    --texto: #e8eaee;
+    --texto-suave: #a0a6b1;
+    --borda: #353943;
+    --primaria: #3b82f6;
+    --erro-fundo: #3a1d1d;
+    --erro-texto: #f6b4b4;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Coluna única: topo, mensagens (cresce e rola) e formulário fixo embaixo. */
+body {
+  margin: 0 auto;
+  max-width: 720px;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--fundo);
+  padding: 0 16px;
+}
+
+.topo {
+  padding: 16px 0 8px;
+  border-bottom: 1px solid var(--borda);
+}
+.topo h1 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+.topo p {
+  margin: 4px 0 0;
+  font-size: 0.875rem;
+  color: var(--texto-suave);
+}
+
+#mensagens {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.msg {
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.msg p {
+  margin: 0;
+  white-space: pre-wrap; /* respeita quebras de linha da resposta */
+}
+.usuario {
+  align-self: flex-end;
+  background: var(--primaria);
+  color: var(--primaria-texto);
+  border-bottom-right-radius: 4px;
+}
+.assistente {
+  align-self: flex-start;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-bottom-left-radius: 4px;
+}
+.erro {
+  align-self: flex-start;
+  background: var(--erro-fundo);
+  color: var(--erro-texto);
+}
+.pensando {
+  color: var(--texto-suave);
+  font-style: italic;
+}
+.msg .fontes {
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: var(--texto-suave);
+}
+
+.exemplos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.exemplo {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--borda);
+  background: var(--fundo);
+  color: var(--texto);
+  cursor: pointer;
+}
+.exemplo:hover {
+  border-color: var(--primaria);
+}
+
+.formulario {
+  padding: 12px 0 16px;
+  border-top: 1px solid var(--borda);
+}
+textarea {
+  width: 100%;
+  font: inherit;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--borda);
+  background: var(--superficie);
+  color: var(--texto);
+  resize: none;
+}
+textarea:focus {
+  outline: 2px solid var(--primaria);
+  outline-offset: -1px;
+}
+.rodape-form {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+.aviso {
+  flex: 1;
+  font-size: 0.85rem;
+  color: var(--erro-texto);
+}
+.contador {
+  font-size: 0.8rem;
+  color: var(--texto-suave);
+}
+button[type="submit"] {
+  font: inherit;
+  padding: 8px 18px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--primaria);
+  color: var(--primaria-texto);
+  cursor: pointer;
+}
+button:disabled,
+textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Some da tela mas continua visível para leitores de tela. */
+.oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
